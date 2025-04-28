@@ -1,0 +1,28 @@
+# Environment variables
+.env
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build directories
+dist/
+build/
+.cache/
+
+# Docker volumes
+data-volumes/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*.swo

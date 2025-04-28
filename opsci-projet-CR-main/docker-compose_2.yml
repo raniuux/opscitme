@@ -1,0 +1,110 @@
+services:
+  product_producer:
+    build:
+      context: ./product-producer-master
+    platform: linux/amd64
+    container_name: product_producer
+    env_file: .env
+    environment:
+      BROKER_1: kafka:9092
+      BROKER_2: kafka:9092
+      BROKER_3: kafka:9092
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_TOKEN: ${STRAPI_TOKEN}
+      FILE_NAME: /data/products.csv
+    volumes:
+      - ./data/products.csv:/data/products.csv
+    networks:
+      - Strapi
+    depends_on:
+      - product_consumer
+
+  product_consumer:
+    platform: linux/amd64
+    image: arthurescriou/product-consumer:1.0.3
+    container_name: product_consumer
+    restart: always
+    env_file: .env
+    environment:
+      BROKER_1: kafka:9092
+      BROKER_2: kafka:9092
+      BROKER_3: kafka:9092
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_TOKEN: ${STRAPI_TOKEN}
+    networks:
+      - Strapi
+
+  event_producer:
+    platform: linux/amd64
+    image: arthurescriou/event-producer:1.0.3
+    container_name: event_producer
+    env_file: .env
+    environment:
+      BROKER_1: kafka:9092
+      BROKER_2: kafka:9092
+      BROKER_3: kafka:9092
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_TOKEN: ${STRAPI_TOKEN}
+      FILE_NAME: /data/events.csv
+    volumes:
+      - ./data/events.csv:/data/events.csv
+    networks:
+      - Strapi
+    depends_on:
+      - event_consumer
+
+  event_consumer:
+    platform: linux/amd64
+    image: arthurescriou/event-consumer:1.0.0
+    container_name: event_consumer
+    env_file: .env
+    environment:
+      BROKER_1: kafka:9092
+      BROKER_2: kafka:9092
+      BROKER_3: kafka:9092
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_TOKEN: ${STRAPI_TOKEN}
+    networks:
+      - Strapi
+
+  stock_producer:
+    platform: linux/amd64
+    image: arthurescriou/stock-producer:1.0.1
+    container_name: stock_producer
+    env_file: .env
+    environment:
+      BROKER_1: kafka:9092
+      BROKER_2: kafka:9092
+      BROKER_3: kafka:9092
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_TOKEN: ${STRAPI_TOKEN}
+      FILE_NAME: /stocks.csv
+    volumes:
+      - ./data/stocks.csv:/stocks.csv
+    networks:
+      - Strapi
+    depends_on:
+      - stock_consumer
+
+  stock_consumer:
+    platform: linux/amd64
+    image: arthurescriou/stock-consumer:1.0.2
+    container_name: stock_consumer
+    env_file: .env
+    environment:
+      BROKER_1: kafka:9092
+      BROKER_2: kafka:9092
+      BROKER_3: kafka:9092
+      STRAPI_URL: ${STRAPI_URL}
+      STRAPI_TOKEN: ${STRAPI_TOKEN}
+    networks:
+      - Strapi
+
+networks:
+  Strapi:
+    external: true
+    name: Strapi
+
+volumes:
+  pgdata:
+  strapi-data:
